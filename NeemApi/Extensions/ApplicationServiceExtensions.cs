@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NeemApi.Data;
+using NeemApi.Helper;
+using NeemApi.Interfaces;
+using NeemApi.Services;
 
 namespace NeemApi.Extensions
 {
@@ -11,6 +14,9 @@ namespace NeemApi.Extensions
             {
                 options.UseSqlite(config.GetConnectionString("DefaultConnection"));
             });
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 
             return services;
         }
