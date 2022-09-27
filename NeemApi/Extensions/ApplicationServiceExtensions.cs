@@ -3,6 +3,7 @@ using NeemApi.Data;
 using NeemApi.Helper;
 using NeemApi.Interfaces;
 using NeemApi.Services;
+using NeemApi.Settings;
 
 namespace NeemApi.Extensions
 {
@@ -16,7 +17,11 @@ namespace NeemApi.Extensions
             });
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IFavoritesRepository, FavoritesRepository>();
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
+            services.Configure<MailSettings>(config.GetSection("MailSettings"));
+            services.AddTransient<IMailService, Services.MailService>();
 
             return services;
         }

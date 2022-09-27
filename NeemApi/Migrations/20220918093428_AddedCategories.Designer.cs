@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NeemApi.Data;
 
@@ -10,9 +11,10 @@ using NeemApi.Data;
 namespace NeemApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220918093428_AddedCategories")]
+    partial class AddedCategories
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.8");
@@ -38,19 +40,10 @@ namespace NeemApi.Migrations
                     b.Property<string>("Phone")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Pin")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("UserName")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.HasIndex("UserName")
-                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -65,9 +58,6 @@ namespace NeemApi.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("Categories");
                 });
@@ -103,14 +93,11 @@ namespace NeemApi.Migrations
                     b.Property<int?>("CategoryId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
-                    b.Property<float>("Price")
-                        .HasColumnType("REAL");
+                    b.Property<int>("Price")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -119,73 +106,25 @@ namespace NeemApi.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("NeemApi.Entities.UserFavorite", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("ProductId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserFavorite");
-                });
-
             modelBuilder.Entity("NeemApi.Entities.Photo", b =>
                 {
-                    b.HasOne("NeemApi.Entities.Product", "Product")
+                    b.HasOne("NeemApi.Entities.Product", null)
                         .WithMany("Photos")
                         .HasForeignKey("ProductId");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("NeemApi.Entities.Product", b =>
                 {
                     b.HasOne("NeemApi.Entities.Category", "Category")
-                        .WithMany("Products")
+                        .WithMany()
                         .HasForeignKey("CategoryId");
 
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("NeemApi.Entities.UserFavorite", b =>
-                {
-                    b.HasOne("NeemApi.Entities.Product", "Product")
-                        .WithMany("UserFavorite")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NeemApi.Entities.AppUser", "User")
-                        .WithMany("UserFavorite")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("NeemApi.Entities.AppUser", b =>
-                {
-                    b.Navigation("UserFavorite");
-                });
-
-            modelBuilder.Entity("NeemApi.Entities.Category", b =>
-                {
-                    b.Navigation("Products");
-                });
-
             modelBuilder.Entity("NeemApi.Entities.Product", b =>
                 {
                     b.Navigation("Photos");
-
-                    b.Navigation("UserFavorite");
                 });
 #pragma warning restore 612, 618
         }
