@@ -37,6 +37,14 @@ namespace NeemApi.Data
                 "all" => products,
                 _ => products.Where(p => p.Category.Name == productParams.Category.ToLower())
             };
+            products = productParams.OrderBy switch
+            {
+                "new" => products.OrderBy(p => p.Id),
+                "old" => products.OrderByDescending(p => p.Id),
+                "high" => products.OrderByDescending(p => p.Price),
+                "low" => products.OrderBy(p => p.Price),
+                _ => products.OrderByDescending(p => p.Name)
+            };
             var result = await PagedList<ProductDto>.CreateAsync(products.ProjectTo<ProductDto>(_mapper
                 .ConfigurationProvider).AsNoTracking(), productParams.PageNumber, productParams.PageSize);
 

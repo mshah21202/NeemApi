@@ -36,11 +36,13 @@ namespace NeemApi.Controllers
                     {
                         p.IsFavorite = true;
                     }
-                    result.Add(p);
                 }
             }
 
+            result.AddRange(products);
+
             Response.AddPaginationHeader(products.CurrentPage, products.PageSize, products.TotalCount, products.TotalPages);
+
             return result;
         }
 
