@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NeemApi.DTOs;
 using NeemApi.Entities;
+using NeemApi.Helper;
 using NeemApi.Interfaces;
 using SQLitePCL;
 
@@ -19,16 +21,35 @@ namespace NeemApi.Data
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ProductDto>> GetFavoritesForUser(string username)
+        public async Task<PagedList<ProductDto>> GetFavoritesForUser(FavoriteParams favoriteParams)
         {
-            var products = _context.Products.Where(p => p.UserFavorite.Any(x => x.User.UserName == username));
-            var result = products.ProjectTo<ProductDto>(_mapper.ConfigurationProvider).AsNoTracking();
+            var products = _context.Products.Include(x => x.Photos).AsQueryable();
+            products = products.Where(x => x.UserFavorite.Any(u => u.User.UserName == favoriteParams.Username));
+            //products = products.Where(x => x.Category.Name == productParams.Category);
+            products = products.Where(x => x.Price >= favoriteParams.MinPrice && x.Price <= favoriteParams.MaxPrice);
+            products = favoriteParams.Category switch
+            {
+                "all" => products,
+                _ => products.Where(p => p.Category.Name == favoriteParams.Category.ToLower())
+            };
+            products = favoriteParams.OrderBy switch
+            {
+                "new" => products.OrderBy(p => p.Id),
+                "old" => products.OrderByDescending(p => p.Id),
+                "high" => products.OrderByDescending(p => p.Price),
+                "low" => products.OrderBy(p => p.Price),
+                _ => products.OrderByDescending(p => p.Name)
+            };
+            var result = await PagedList<ProductDto>.CreateAsync(products.ProjectTo<ProductDto>(_mapper
+                .ConfigurationProvider).AsNoTracking(), favoriteParams.PageNumber, favoriteParams.PageSize);
+
             return result;
         }
 
         public async Task<UserFavorite> GetFavoriteUser(int userId, int productId)
         {
-            return await _context.UserFavorite.FindAsync(userId, productId);
+            var userFavorite = await _context.UserFavorite.FirstOrDefaultAsync(x => x.UserId == userId && x.ProductId == productId);
+            return userFavorite;
         }
 
         public async Task<bool> SaveAllAsync()

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using NeemApi.Data;
 using NeemApi.Helper;
 using NeemApi.Interfaces;
@@ -19,9 +20,11 @@ namespace NeemApi.Extensions
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IFavoritesRepository, FavoritesRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             services.Configure<MailSettings>(config.GetSection("MailSettings"));
             services.AddTransient<IMailService, Services.MailService>();
+
 
             return services;
         }

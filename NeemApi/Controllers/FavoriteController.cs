@@ -5,6 +5,7 @@ using NeemApi.Data;
 using NeemApi.DTOs;
 using NeemApi.Entities;
 using NeemApi.Extensions;
+using NeemApi.Helper;
 using NeemApi.Interfaces;
 using SQLitePCL;
 
@@ -27,9 +28,10 @@ namespace NeemApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetFavoriteProducts()
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetFavoriteProducts([FromQuery]FavoriteParams favoriteParams)
         {
-            var products = await _favoritesRepository.GetFavoritesForUser(User.GetUsername());
+            favoriteParams.Username = User.GetUsername();
+            var products = await _favoritesRepository.GetFavoritesForUser(favoriteParams);
             List<ProductDto> result = new List<ProductDto>();
             foreach (var product in products)
             {

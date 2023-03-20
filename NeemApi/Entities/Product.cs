@@ -9,5 +9,6 @@
         public ICollection<Photo> Photos { get; set; }
         public Category Category { get; set; }
         public ICollection<UserFavorite> UserFavorite { get; set; }
+        public ICollection<OrderProduct> OrderProduct { get; set; }
     }
 }

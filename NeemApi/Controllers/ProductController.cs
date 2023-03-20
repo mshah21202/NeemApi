@@ -29,7 +29,11 @@ namespace NeemApi.Controllers
             List<ProductDto> result = new List<ProductDto>();
             if (User.Identity.IsAuthenticated)
             {
-                var favorites = await _favoriteRepository.GetFavoritesForUser(User.GetUsername());
+                FavoriteParams favoriteParams = new FavoriteParams
+                { 
+                    Username = User.GetUsername()
+                };
+                var favorites = await _favoriteRepository.GetFavoritesForUser(favoriteParams);
                 foreach(var p in products)
                 {
                     if (favorites.Any(f => f.Id == p.Id))
@@ -47,18 +51,30 @@ namespace NeemApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ProductDto> GetProductById(int id)
+        public async Task<ProductDetailDto> GetProductById(int id)
         {
-            var product = await _productRepository.GetProductByIdAsync(id);
+            var product = await _productRepository.GetProductDetailsByIdAsync(id);
             if (User.Identity.IsAuthenticated)
             {
-                var favorites = await _favoriteRepository.GetFavoritesForUser(User.GetUsername());
+                FavoriteParams favoriteParams = new FavoriteParams
+                {
+                    Username = User.GetUsername()
+                };
+                var favorites = await _favoriteRepository.GetFavoritesForUser(favoriteParams);
                 if (favorites.Any(f => f.Id == product.Id))
                 {
                     product.IsFavorite = true;
                 }
             }
             return product;
+        }
+
+        [HttpGet("cart-products")]
+        public async Task<IEnumerable<ProductDto>> GetProductsByIds([FromQuery]List<int> id)
+        {
+            var products = await _productRepository.GetProductsByIdsAsync(id);
+            
+            return products;
         }
 
         //[HttpGet("category/{category}")]

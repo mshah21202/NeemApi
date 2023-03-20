@@ -1,15 +1,13 @@
-﻿namespace NeemApi.Entities
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace NeemApi.Entities
 {
-    public class AppUser
+    public class AppUser : IdentityUser<int>
     {
-        public int Id { get; set; }
-        public string UserName { get; set; }
         public string Name { get; set; }
-        public string Email { get; set; }
         public string Phone { get; set; }
-        public byte[] PasswordHash { get; set; }
-        public byte[] PasswordSalt { get; set; }
         public ICollection<UserFavorite> UserFavorite { get; set; }
         public int Pin { get; set; }
+        public ICollection<AppUserRole> UserRoles { get; set; }
     }
 }

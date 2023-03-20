@@ -20,11 +20,22 @@ namespace NeemApi.Data
             _mapper = mapper;
         }
 
-        public async Task<ProductDto> GetProductByIdAsync(int id)
+        public async Task<ProductDetailDto> GetProductDetailsByIdAsync(int id)
         {
             var product = await _context.Products.Include(p => p.Category).Include(x => x.Photos).FirstOrDefaultAsync(p=> p.Id == id);
-            var result = _mapper.Map<ProductDto>(product);
+            var result = _mapper.Map<ProductDetailDto>(product);
             return result;
+        }
+
+        public async Task<IEnumerable<ProductDto>> GetProductsByIdsAsync(List<int> ids)
+        {
+            List<ProductDto> products = new List<ProductDto>();
+            foreach (int id in ids)
+            {
+                var product = _mapper.Map<ProductDto>(await _context.Products.Include(p => p.Photos).FirstOrDefaultAsync(p => p.Id == id));
+                products.Add(product);
+            }
+            return products;
         }
 
         public async Task<PagedList<ProductDto>> GetProductsAsync(ProductParams productParams)

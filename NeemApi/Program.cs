@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Identity;
+using NeemApi.Data;
+using NeemApi.Entities;
 using NeemApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,4 +31,20 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+using var scope = app.Services.CreateScope();
+
+var services = scope.ServiceProvider;
+
+try
+{
+    var context = services.GetRequiredService<DataContext>();
+    var userManager = services.GetRequiredService<UserManager<AppUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
+    await Seed.SeedUsers(userManager, roleManager);
+} catch (Exception ex)
+{
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "Error Occured during migration");
+}
+
+await app.RunAsync();
